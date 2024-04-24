@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="bootstrap.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+</head>
+<style>
+    body{
+        font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+        background-color:cadetblue;
+    }
+    ::-webkit-scrollbar{
+        width: 7px;
+        border-radius: 30px;
+    }
+    ::-webkit-scrollbar-track{
+        background-color: black;
+    }
+    ::-webkit-scrollbar-thumb{
+        background-color: aliceblue;
+    }
+    .card:hover{
+        background-color: transparent;
+        border: 2px solid black;
+        color: aliceblue;
+        cursor: pointer;
+        transition: 1s ease-in-out;
+    }
+</style>
+<body>
+    <div class="container-fluid">
+        <marquee behavior="alternate" direction="right" class="text-light">Designed By <span class="fw-bold">MovicDev</span></marquee>
+        <div class="row col-10 col-lg-6 mx-auto shadow-sm p-3 mt-5">
+            <h1 class="text-center text-light">Tasty Treats Directory</h1>
+            <div class="animate__animated animate__flash text-center text-width py-2 alert alert-warning" style="display: none" id="empty">Input field cannot be empty</div>
+            <input type="text" class="form-control shadow-none my-2 rounded-0 " value="" id="foodNam" placeholder="FoodName" autofocus>
+            <input type="file" class="form-control shadow-none my-2 rounded-0 bg-transparent" value="" id="fileInput" placeholder="">
+            <textarea cols="30" rows="5" class="form-control shadow-none my-2 rounded-0 " value="" id="desc" maxlength="150" placeholder="Food Description"></textarea>
+            <button onclick="submitFood()" class="form-control my-2 btn btn-dark"  type="submit">submit</button>
+        </div>
+        <div class="row m-2 p-5 justify-content-around columns-gap-2 g-2" id="show">
+        </div>
+    </div>
+
+    <script>
+        let allFood = [];
+
+        if (localStorage.itemsOn) {
+            allFood = JSON.parse(localStorage.getItem('itemsOn'));
+        }
+
+        let listFood = JSON.parse(localStorage.getItem('itemsOn')) || [];
+
+        class Food {
+            constructor(foodName, fileInput, desc) {
+                this.foodName = foodName;
+                this.fileInput = fileInput;
+                this.desc = desc;
+            }
+
+            displayFood() {
+                `<div class="card p-2 border-0" style="width: 18rem;">
+                <img src="${this.foodName}" class="card-img-top h-50" alt="...">
+                <div class="card-body">
+                  <h5 class="card-title">${this.foodName}</h5>
+                  <p class="card-text">${this.desc}</p>
+                </div>
+              </div>  
+                `
+            }
+        }
+
+        const submitFood = () => {
+
+            if (foodNam.value === "" || desc.value === "" || fileInput.files.length === 0) {
+                empty.style.display = 'block';
+                setTimeout(() => {
+                   empty.style.display = 'none';
+                }, 3000);
+            } else {
+                let reader = new FileReader();
+                reader.onload = function(event) {
+                    let base64Image = event.target.result;
+                    let foodObj = new Food(foodNam.value, base64Image, desc.value);
+                    allFood.push(foodObj);
+                    localStorage.setItem("itemsOn", JSON.stringify(allFood));
+                    location.reload()
+                };
+
+                reader.readAsDataURL(fileInput.files[0]);
+               
+            }
+        };
+        listFood.map((food) => {
+            show.innerHTML +=`
+            <div class="card p-2" style="width: 18rem; height:22rem">
+                <img src="${food.fileInput}" class="card-img-top w-full h-50" alt="...">
+                <div class="card-body">
+                  <h5 class="card-title">${food.foodName}</h5>
+                  <p class="card-text">${food.desc}</p>
+                </div>
+              </div>  
+            `;
+        });
+
+       
+    </script>
+</body>
+</html>
